@@ -25,9 +25,23 @@ const Index = () => {
     setShowQuestionForm(false);
   };
 
+  const toggleQuestionForm = () => {
+    setShowQuestionForm(!showQuestionForm);
+    
+    // Scroll to the form if it's being shown
+    if (!showQuestionForm) {
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        });
+      }, 100);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <Navbar />
+      <Navbar onAskQuestion={toggleQuestionForm} />
       
       <main className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="flex justify-between items-center mb-4">
@@ -40,7 +54,7 @@ const Index = () => {
             <Button 
               size="sm" 
               className="bg-ocean-DEFAULT hover:bg-ocean-dark"
-              onClick={() => setShowQuestionForm(!showQuestionForm)}
+              onClick={toggleQuestionForm}
             >
               <Plus className="h-4 w-4 mr-1" />
               Ask
