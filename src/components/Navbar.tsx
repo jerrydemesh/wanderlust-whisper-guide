@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, Search, Globe, Mic, MessageCircle } from 'lucide-react';
+import { MapPin, Search, Globe, MessageCircle, Mic, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileSidebar from './MobileSidebar';
 
