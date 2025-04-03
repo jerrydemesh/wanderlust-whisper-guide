@@ -26,6 +26,7 @@ const Index = () => {
   };
 
   const toggleQuestionForm = () => {
+    console.log('Toggling question form, current state:', showQuestionForm);
     setShowQuestionForm(!showQuestionForm);
     
     // Scroll to the form if it's being shown

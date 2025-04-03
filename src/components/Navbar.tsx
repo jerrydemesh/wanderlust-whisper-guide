@@ -14,7 +14,9 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <MobileSidebar onAskQuestion={onAskQuestion} />
+            <div className="md:hidden">
+              <MobileSidebar onAskQuestion={onAskQuestion} />
+            </div>
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-ocean-dark dark:text-ocean-light">
                 Wanderlust
