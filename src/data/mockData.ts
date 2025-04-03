@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -126,7 +125,7 @@ export const questions: Question[] = [
     id: 'q3',
     userId: 'user1',
     originalText: 'What\'s the best way to get from Narita Airport to Tokyo city center with luggage?',
-    translatedText: '荷物を持って成田空港から東京の中心部に行くための最良の方法は何ですか？',
+    translatedText: '荷物を持って成田空港から東��の中心部に行くための最良の方法は何ですか？',
     originalLanguage: 'English',
     location: 'Tokyo, Japan',
     timestamp: '2023-10-17T08:15:00Z',
