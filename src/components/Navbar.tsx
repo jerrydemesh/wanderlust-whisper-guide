@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Search, Globe, MessageCircle, Mic, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileSidebar from './MobileSidebar';
@@ -9,6 +9,13 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
+  const [showMessages, setShowMessages] = useState(false);
+
+  const toggleMessages = () => {
+    console.log('Toggling messages, current state:', showMessages);
+    setShowMessages(!showMessages);
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-3">
@@ -41,7 +48,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             <Button variant="ghost" size="icon">
               <Globe className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={toggleMessages}
+            >
               <MessageCircle className="h-5 w-5" />
             </Button>
             <Button 
@@ -54,6 +65,37 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           </div>
         </div>
       </div>
+      
+      {showMessages && (
+        <div className="absolute right-4 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-medium">Messages</h3>
+            <Button variant="ghost" size="sm" onClick={toggleMessages}>
+              Close
+            </Button>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+              <p className="text-sm font-medium">Mika from Tokyo</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                I can help with your question about the best sushi places!
+              </p>
+            </div>
+            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+              <p className="text-sm font-medium">Haruto from Kyoto</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Here's information about the temple you asked about...
+              </p>
+            </div>
+            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+              <p className="text-sm font-medium">Yuki from Osaka</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Let me know if you need more food recommendations!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
