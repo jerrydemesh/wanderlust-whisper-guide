@@ -5,7 +5,7 @@ import QuestionCard from '@/components/QuestionCard';
 import QuestionForm from '@/components/QuestionForm';
 import { getQuestionsWithUsers } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
-import { Plus, Filter, ArrowDown, ArrowUp } from 'lucide-react';
+import { Plus, Filter, ArrowDown, ArrowUp, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Question } from '@/data/mockData';
 import {
@@ -62,7 +62,6 @@ const Index = () => {
   };
 
   const toggleQuestionForm = () => {
-    console.log('Toggling question form, current state:', showQuestionForm);
     setShowQuestionForm(!showQuestionForm);
     
     // Scroll to the form if it's being shown
@@ -101,6 +100,18 @@ const Index = () => {
       <Navbar onAskQuestion={toggleQuestionForm} />
       
       <main className="container mx-auto px-4 py-6 max-w-2xl">
+        {/* More prominent Ask Question button */}
+        <div className="mb-6">
+          <Button 
+            onClick={toggleQuestionForm}
+            className="w-full bg-sunset-DEFAULT hover:bg-sunset-dark text-white font-medium py-3 flex items-center justify-center gap-2"
+            size="lg"
+          >
+            <Mic className="h-5 w-5" />
+            {showQuestionForm ? "Close Question Form" : "Ask a Question"}
+          </Button>
+        </div>
+        
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-ocean-dark dark:text-ocean-light">Recent Questions</h2>
           <div className="flex gap-2">
@@ -164,14 +175,6 @@ const Index = () => {
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button 
-              size="sm" 
-              className="bg-ocean-DEFAULT hover:bg-ocean-dark"
-              onClick={toggleQuestionForm}
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Ask
-            </Button>
           </div>
         </div>
         

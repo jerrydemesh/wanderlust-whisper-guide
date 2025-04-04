@@ -8,10 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
 import { useIsMobile } from '@/hooks/use-mobile';
-
-interface NavbarProps {
-  onAskQuestion: () => void;
-}
+import VoiceInput from './VoiceInput';
+import { Link } from 'react-router-dom';
+import LanguageSelector from './LanguageSelector';
+import LocationSelector from './LocationSelector';
 
 export interface Message {
   id: string;
@@ -32,12 +32,18 @@ export interface Conversation {
   messages: Message[];
 }
 
+interface NavbarProps {
+  onAskQuestion: () => void;
+}
+
 const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
   const [showMessages, setShowMessages] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const [showLocationSelector, setShowLocationSelector] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState("Tokyo, Japan");
   
   const [conversations, setConversations] = useState<Record<string, Conversation>>({
     'user1': {
@@ -120,6 +126,39 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
     });
   };
 
+  const handleVoiceRecording = (blob: Blob) => {
+    toast({
+      title: "Voice Message",
+      description: "Your voice message will be transcribed and sent.",
+    });
+    
+    // In a real app, we would process the voice blob here
+    // and convert to text before sending
+    
+    // Simulate a message from the voice recording
+    if (activeConversation) {
+      const voiceMessage: Message = {
+        id: Date.now().toString(),
+        sender: 'You',
+        location: 'Current Location',
+        text: "[Voice message transcribed automatically]",
+        isIncoming: false,
+        timestamp: new Date()
+      };
+      
+      setConversations(prev => ({
+        ...prev,
+        [activeConversation]: {
+          ...prev[activeConversation],
+          messages: [...prev[activeConversation].messages, voiceMessage]
+        }
+      }));
+      
+      // Simulate response
+      simulateResponse(activeConversation);
+    }
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim()) {
@@ -143,27 +182,8 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           }
         }));
         
-        // Simulate response (in a real app, this would be an API call)
-        setTimeout(() => {
-          const conversation = conversations[activeConversation];
-          const responseMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            sender: conversation.username,
-            senderId: conversation.userId,
-            location: conversation.location,
-            text: "Thanks for your message! I'll translate and respond to your query shortly.",
-            isIncoming: true,
-            timestamp: new Date()
-          };
-          
-          setConversations(prev => ({
-            ...prev,
-            [activeConversation]: {
-              ...prev[activeConversation],
-              messages: [...prev[activeConversation].messages, responseMessage]
-            }
-          }));
-        }, 1000);
+        // Simulate response
+        simulateResponse(activeConversation);
       }
       
       setNewMessage('');
@@ -173,6 +193,29 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
         description: "Your message has been sent and will be translated automatically.",
       });
     }
+  };
+  
+  const simulateResponse = (userId: string) => {
+    setTimeout(() => {
+      const conversation = conversations[userId];
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: conversation.username,
+        senderId: conversation.userId,
+        location: conversation.location,
+        text: "Thanks for your message! I'll translate and respond to your query shortly.",
+        isIncoming: true,
+        timestamp: new Date()
+      };
+      
+      setConversations(prev => ({
+        ...prev,
+        [userId]: {
+          ...prev[userId],
+          messages: [...prev[userId].messages, responseMessage]
+        }
+      }));
+    }, 1000);
   };
 
   const handleOpenConversation = (userId: string) => {
@@ -186,6 +229,42 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
       window.location.href = `/user/${userId}`;
     }
   };
+
+  const handleUpdateLocation = (location: string) => {
+    setCurrentLocation(location);
+    setShowLocationSelector(false);
+    
+    toast({
+      title: "Location Updated",
+      description: `Location set to ${location}`,
+    });
+  };
+  
+  // Detect user's location and language on first load - in a real app
+  React.useEffect(() => {
+    // This would be replaced with actual geolocation API usage
+    const detectLocation = async () => {
+      try {
+        // Simulate getting user location
+        console.log("Getting user location");
+        
+        // In a real app, we would use the browser's geolocation API
+        // and then reverse geocode to get the city/country
+        
+        // This would be replaced with real location detection
+        // For now, just show a toast that we would ask for location
+        toast({
+          title: "Location",
+          description: "The app would ask for your location permission to better assist you.",
+        });
+      } catch (error) {
+        console.error("Error detecting location:", error);
+      }
+    };
+    
+    // Call once on first load
+    detectLocation();
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
@@ -206,9 +285,14 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           </div>
           
           <div className="hidden md:flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="text-muted-foreground flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-muted-foreground flex items-center"
+              onClick={() => setShowLocationSelector(true)}
+            >
               <MapPin className="mr-1 h-4 w-4" />
-              <span>Tokyo, Japan</span>
+              <span>{currentLocation}</span>
             </Button>
           </div>
           
@@ -269,18 +353,15 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-sm font-medium">{message.sender}</p>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6"
+                    <Link 
+                      to={`/user/${message.userId}`} 
+                      className="text-sm font-medium hover:underline"
                       onClick={(e) => {
                         e.stopPropagation();
-                        message.userId && handleViewProfile(message.userId);
                       }}
                     >
-                      <User className="h-3 w-3" />
-                    </Button>
+                      {message.sender}
+                    </Link>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                     {message.text}
@@ -311,15 +392,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 <X className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <h3 className="font-medium">{conversations[activeConversation].username}</h3>
+              <Link to={`/user/${activeConversation}`} className="font-medium hover:underline">
+                {conversations[activeConversation].username}
+              </Link>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => handleViewProfile(activeConversation)}
-            >
-              Profile
-            </Button>
           </div>
           
           <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
@@ -355,7 +431,13 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
               onChange={(e) => setNewMessage(e.target.value)}
             />
             <div className="flex justify-between items-center">
-              <p className="text-xs text-muted-foreground">Auto-translation enabled</p>
+              <div className="flex items-center">
+                <p className="text-xs text-muted-foreground mr-2">Auto-translation enabled</p>
+                <VoiceInput 
+                  onRecordingComplete={handleVoiceRecording} 
+                  className="h-6"
+                />
+              </div>
               <Button 
                 type="submit" 
                 size="sm" 
@@ -368,6 +450,13 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             </div>
           </form>
         </div>
+      )}
+      
+      {showLocationSelector && (
+        <LocationSelector 
+          onSelect={handleUpdateLocation} 
+          onClose={() => setShowLocationSelector(false)}
+        />
       )}
     </nav>
   );

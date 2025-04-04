@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,6 +8,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import AnswerCard from './AnswerCard';
 import VoiceInput from './VoiceInput';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 interface QuestionCardProps {
   question: Question;
@@ -40,12 +40,27 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
       <CardHeader className="p-4 pb-2">
         <div className="flex justify-between items-start">
           <div className="flex gap-3">
-            <Avatar>
-              <AvatarImage src={question.user?.avatar} alt={question.user?.name} />
-              <AvatarFallback>{question.user?.name?.charAt(0)}</AvatarFallback>
-            </Avatar>
+            {question.user?.id ? (
+              <Link to={`/user/${question.user.id}`}>
+                <Avatar>
+                  <AvatarImage src={question.user?.avatar} alt={question.user?.name} />
+                  <AvatarFallback>{question.user?.name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Avatar>
+                <AvatarImage src={question.user?.avatar} alt={question.user?.name} />
+                <AvatarFallback>{question.user?.name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+            )}
             <div>
-              <h3 className="font-medium">{question.user?.name}</h3>
+              {question.user?.id ? (
+                <Link to={`/user/${question.user.id}`} className="hover:underline">
+                  <h3 className="font-medium">{question.user?.name}</h3>
+                </Link>
+              ) : (
+                <h3 className="font-medium">{question.user?.name}</h3>
+              )}
               <div className="flex items-center text-sm text-muted-foreground">
                 <span className={`language-badge ${question.user?.isLocal ? 'language-badge-local' : 'language-badge-traveler'}`}>
                   {question.originalLanguage}
