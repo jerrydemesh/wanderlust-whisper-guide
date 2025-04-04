@@ -79,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           id: (Date.now() + 1).toString(),
           sender: 'Local Guide',
           location: 'Tokyo',
-          text: 'Thanks for your message! I'll translate and respond to your query shortly.',
+          text: "Thanks for your message! I'll translate and respond to your query shortly.",
           isIncoming: true
         };
         setMessages(prev => [...prev, responseMessage]);
