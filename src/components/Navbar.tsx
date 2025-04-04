@@ -1,54 +1,116 @@
 
 import React, { useState } from 'react';
-import { MapPin, Search, Globe, MessageCircle, Mic, Menu, Send } from 'lucide-react';
+import { MapPin, Search, Globe, MessageCircle, Mic, Menu, Send, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileSidebar from './MobileSidebar';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface NavbarProps {
   onAskQuestion: () => void;
 }
 
-interface Message {
+export interface Message {
   id: string;
   sender: string;
+  senderId?: string;
+  avatar?: string;
   location: string;
   text: string;
   isIncoming: boolean;
+  timestamp?: Date;
+}
+
+export interface Conversation {
+  userId: string;
+  username: string;
+  avatar?: string;
+  location: string;
+  messages: Message[];
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
   const [showMessages, setShowMessages] = useState(false);
   const [newMessage, setNewMessage] = useState('');
+  const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      sender: 'Mika',
+  const isMobile = useIsMobile();
+  
+  const [conversations, setConversations] = useState<Record<string, Conversation>>({
+    'user1': {
+      userId: 'user1',
+      username: 'Mika',
+      avatar: '/placeholder.svg',
       location: 'Tokyo',
-      text: 'I can help with your question about the best sushi places!',
-      isIncoming: true
+      messages: [
+        {
+          id: '1',
+          sender: 'Mika',
+          senderId: 'user1',
+          location: 'Tokyo',
+          text: 'I can help with your question about the best sushi places!',
+          isIncoming: true,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 hours ago
+        }
+      ]
     },
-    {
-      id: '2',
-      sender: 'Haruto',
+    'user2': {
+      userId: 'user2',
+      username: 'Haruto',
+      avatar: '/placeholder.svg',
       location: 'Kyoto',
-      text: 'Here\'s information about the temple you asked about...',
-      isIncoming: true
+      messages: [
+        {
+          id: '2',
+          sender: 'Haruto',
+          senderId: 'user2',
+          location: 'Kyoto',
+          text: "Here's information about the temple you asked about...",
+          isIncoming: true,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) // 1 day ago
+        }
+      ]
     },
-    {
-      id: '3',
-      sender: 'Yuki',
+    'user3': {
+      userId: 'user3',
+      username: 'Yuki',
+      avatar: '/placeholder.svg',
       location: 'Osaka',
-      text: 'Let me know if you need more food recommendations!',
-      isIncoming: true
+      messages: [
+        {
+          id: '3',
+          sender: 'Yuki',
+          senderId: 'user3',
+          location: 'Osaka',
+          text: 'Let me know if you need more food recommendations!',
+          isIncoming: true,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48) // 2 days ago
+        }
+      ]
     }
-  ]);
+  });
+
+  // All messages for the messaging overview
+  const allMessages = Object.values(conversations).flatMap(conv => 
+    conv.messages.map(msg => ({
+      ...msg,
+      username: conv.username,
+      userId: conv.userId,
+      avatar: conv.avatar
+    }))
+  ).sort((a, b) => {
+    const timeA = a.timestamp?.getTime() || 0;
+    const timeB = b.timestamp?.getTime() || 0;
+    return timeB - timeA; // Sort by most recent
+  });
 
   const toggleMessages = () => {
     console.log('Toggling messages, current state:', showMessages);
     setShowMessages(!showMessages);
+    setActiveConversation(null); // Reset active conversation when closing
   };
 
   const handleLanguageChange = () => {
@@ -67,28 +129,61 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
         sender: 'You',
         location: 'Current Location',
         text: newMessage,
-        isIncoming: false
+        isIncoming: false,
+        timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, userMessage]);
-      setNewMessage('');
+      if (activeConversation) {
+        // Add to specific conversation
+        setConversations(prev => ({
+          ...prev,
+          [activeConversation]: {
+            ...prev[activeConversation],
+            messages: [...prev[activeConversation].messages, userMessage]
+          }
+        }));
+        
+        // Simulate response (in a real app, this would be an API call)
+        setTimeout(() => {
+          const conversation = conversations[activeConversation];
+          const responseMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            sender: conversation.username,
+            senderId: conversation.userId,
+            location: conversation.location,
+            text: "Thanks for your message! I'll translate and respond to your query shortly.",
+            isIncoming: true,
+            timestamp: new Date()
+          };
+          
+          setConversations(prev => ({
+            ...prev,
+            [activeConversation]: {
+              ...prev[activeConversation],
+              messages: [...prev[activeConversation].messages, responseMessage]
+            }
+          }));
+        }, 1000);
+      }
       
-      // Simulate response (in a real app, this would be an API call)
-      setTimeout(() => {
-        const responseMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          sender: 'Local Guide',
-          location: 'Tokyo',
-          text: "Thanks for your message! I'll translate and respond to your query shortly.",
-          isIncoming: true
-        };
-        setMessages(prev => [...prev, responseMessage]);
-      }, 1000);
+      setNewMessage('');
       
       toast({
         title: "Message Sent",
         description: "Your message has been sent and will be translated automatically.",
       });
+    }
+  };
+
+  const handleOpenConversation = (userId: string) => {
+    setActiveConversation(userId);
+  };
+
+  const handleViewProfile = (userId: string) => {
+    // Open the user profile drawer
+    const user = conversations[userId];
+    if (user) {
+      window.location.href = `/user/${userId}`;
     }
   };
 
@@ -117,10 +212,13 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             </Button>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Search className="h-5 w-5" />
-            </Button>
+          {/* Make the icons container more responsive on small screens */}
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            {!isMobile && (
+              <Button variant="ghost" size="icon">
+                <Search className="h-5 w-5" />
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -149,7 +247,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
         </div>
       </div>
       
-      {showMessages && (
+      {showMessages && !activeConversation && (
         <div className="absolute right-4 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-medium">Messages</h3>
@@ -159,7 +257,73 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           </div>
           
           <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
-            {messages.map((message) => (
+            {allMessages.map((message) => (
+              <div 
+                key={message.id} 
+                className="p-3 rounded-md bg-gray-100 dark:bg-gray-700 flex items-start cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"
+                onClick={() => message.userId && handleOpenConversation(message.userId)}
+              >
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src={message.avatar} alt={message.sender} />
+                  <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-sm font-medium">{message.sender}</p>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        message.userId && handleViewProfile(message.userId);
+                      }}
+                    >
+                      <User className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                    {message.text}
+                  </p>
+                  <div className="flex items-center mt-1 text-xs text-gray-400">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    <span>{message.location}</span>
+                    <span className="mx-1">•</span>
+                    <span>{message.timestamp?.toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {showMessages && activeConversation && (
+        <div className="absolute right-4 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="mr-2"
+                onClick={() => setActiveConversation(null)}
+              >
+                <X className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <h3 className="font-medium">{conversations[activeConversation].username}</h3>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => handleViewProfile(activeConversation)}
+            >
+              Profile
+            </Button>
+          </div>
+          
+          <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
+            {conversations[activeConversation].messages.map((message) => (
               <div 
                 key={message.id} 
                 className={`p-3 rounded-md ${
@@ -174,6 +338,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 <p className={`text-xs ${message.isIncoming ? 'text-gray-500 dark:text-gray-400' : 'text-white/90'}`}>
                   {message.text}
                 </p>
+                {message.timestamp && (
+                  <p className="text-xs mt-1 text-gray-400">
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )}
               </div>
             ))}
           </div>
