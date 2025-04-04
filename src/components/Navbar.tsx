@@ -1,19 +1,95 @@
 
 import React, { useState } from 'react';
-import { MapPin, Search, Globe, MessageCircle, Mic, Menu } from 'lucide-react';
+import { MapPin, Search, Globe, MessageCircle, Mic, Menu, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileSidebar from './MobileSidebar';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 interface NavbarProps {
   onAskQuestion: () => void;
 }
 
+interface Message {
+  id: string;
+  sender: string;
+  location: string;
+  text: string;
+  isIncoming: boolean;
+}
+
 const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
   const [showMessages, setShowMessages] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      sender: 'Mika',
+      location: 'Tokyo',
+      text: 'I can help with your question about the best sushi places!',
+      isIncoming: true
+    },
+    {
+      id: '2',
+      sender: 'Haruto',
+      location: 'Kyoto',
+      text: 'Here\'s information about the temple you asked about...',
+      isIncoming: true
+    },
+    {
+      id: '3',
+      sender: 'Yuki',
+      location: 'Osaka',
+      text: 'Let me know if you need more food recommendations!',
+      isIncoming: true
+    }
+  ]);
 
   const toggleMessages = () => {
     console.log('Toggling messages, current state:', showMessages);
     setShowMessages(!showMessages);
+  };
+
+  const handleLanguageChange = () => {
+    toast({
+      title: "Language Selection",
+      description: "Language selection feature coming soon!",
+    });
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newMessage.trim()) {
+      // Add user message
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        sender: 'You',
+        location: 'Current Location',
+        text: newMessage,
+        isIncoming: false
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      setNewMessage('');
+      
+      // Simulate response (in a real app, this would be an API call)
+      setTimeout(() => {
+        const responseMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          sender: 'Local Guide',
+          location: 'Tokyo',
+          text: 'Thanks for your message! I'll translate and respond to your query shortly.',
+          isIncoming: true
+        };
+        setMessages(prev => [...prev, responseMessage]);
+      }, 1000);
+      
+      toast({
+        title: "Message Sent",
+        description: "Your message has been sent and will be translated automatically.",
+      });
+    }
   };
 
   return (
@@ -45,13 +121,19 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleLanguageChange}
+              title="Change language"
+            >
               <Globe className="h-5 w-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
               onClick={toggleMessages}
+              title="Messages"
             >
               <MessageCircle className="h-5 w-5" />
             </Button>
@@ -59,6 +141,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
               size="icon" 
               className="bg-sunset-DEFAULT hover:bg-sunset-dark rounded-full"
               onClick={onAskQuestion}
+              title="Ask a question"
             >
               <Mic className="h-5 w-5" />
             </Button>
@@ -74,26 +157,47 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
               Close
             </Button>
           </div>
-          <div className="space-y-3">
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
-              <p className="text-sm font-medium">Mika from Tokyo</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                I can help with your question about the best sushi places!
-              </p>
-            </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
-              <p className="text-sm font-medium">Haruto from Kyoto</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Here's information about the temple you asked about...
-              </p>
-            </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md">
-              <p className="text-sm font-medium">Yuki from Osaka</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Let me know if you need more food recommendations!
-              </p>
-            </div>
+          
+          <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
+            {messages.map((message) => (
+              <div 
+                key={message.id} 
+                className={`p-3 rounded-md ${
+                  message.isIncoming 
+                    ? 'bg-gray-100 dark:bg-gray-700' 
+                    : 'bg-ocean-light dark:bg-ocean-dark text-white ml-8'
+                }`}
+              >
+                <p className="text-sm font-medium">
+                  {message.isIncoming ? `${message.sender} from ${message.location}` : message.sender}
+                </p>
+                <p className={`text-xs ${message.isIncoming ? 'text-gray-500 dark:text-gray-400' : 'text-white/90'}`}>
+                  {message.text}
+                </p>
+              </div>
+            ))}
           </div>
+          
+          <form onSubmit={handleSendMessage} className="flex flex-col space-y-2">
+            <Textarea
+              placeholder="Type a message..."
+              className="w-full resize-none text-sm min-h-[60px]"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">Auto-translation enabled</p>
+              <Button 
+                type="submit" 
+                size="sm" 
+                className="bg-ocean-DEFAULT hover:bg-ocean-dark"
+                disabled={!newMessage.trim()}
+              >
+                <Send className="h-3 w-3 mr-1" />
+                Send
+              </Button>
+            </div>
+          </form>
         </div>
       )}
     </nav>
