@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,7 +9,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import AnswerCard from './AnswerCard';
 import VoiceInput from './VoiceInput';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface QuestionCardProps {
   question: Question;
@@ -18,6 +19,7 @@ interface QuestionCardProps {
 const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [showTranslation, setShowTranslation] = useState(true);
+  const navigate = useNavigate();
   
   const formattedDate = new Date(question.timestamp).toLocaleDateString('en-US', {
     day: 'numeric',
@@ -35,32 +37,47 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
     }
   };
 
+  const handleViewAnswers = () => {
+    if (question.answers.length > 0) {
+      // If there are answers, navigate to a dedicated page to view them
+      // For now just toggle the expanded view
+      setIsExpanded(!isExpanded);
+      
+      // In a real implementation you would navigate to a dedicated answer page
+      // navigate(`/question/${question.id}/answers`);
+    } else {
+      // If no answers, just toggle the expanded view to show the answer form
+      setIsExpanded(!isExpanded);
+    }
+  };
+
+  const handleGoToUserProfile = (userId: string | undefined) => {
+    if (userId) {
+      navigate(`/user/${userId}`);
+    }
+  };
+
   return (
     <Card className="gradient-card w-full mb-4 overflow-hidden">
       <CardHeader className="p-4 pb-2">
         <div className="flex justify-between items-start">
           <div className="flex gap-3">
-            {question.user?.id ? (
-              <Link to={`/user/${question.user.id}`}>
-                <Avatar>
-                  <AvatarImage src={question.user?.avatar} alt={question.user?.name} />
-                  <AvatarFallback>{question.user?.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-              </Link>
-            ) : (
+            <div 
+              onClick={() => handleGoToUserProfile(question.user?.id)}
+              className={question.user?.id ? "cursor-pointer" : ""}
+            >
               <Avatar>
                 <AvatarImage src={question.user?.avatar} alt={question.user?.name} />
                 <AvatarFallback>{question.user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
-            )}
+            </div>
             <div>
-              {question.user?.id ? (
-                <Link to={`/user/${question.user.id}`} className="hover:underline">
-                  <h3 className="font-medium">{question.user?.name}</h3>
-                </Link>
-              ) : (
-                <h3 className="font-medium">{question.user?.name}</h3>
-              )}
+              <h3 
+                className={cn("font-medium", question.user?.id ? "cursor-pointer hover:underline" : "")}
+                onClick={() => handleGoToUserProfile(question.user?.id)}
+              >
+                {question.user?.name}
+              </h3>
               <div className="flex items-center text-sm text-muted-foreground">
                 <span className={`language-badge ${question.user?.isLocal ? 'language-badge-local' : 'language-badge-traveler'}`}>
                   {question.originalLanguage}
@@ -117,7 +134,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
             variant="ghost"
             size="sm"
             className="text-muted-foreground h-8"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={handleViewAnswers}
           >
             <MessageCircle className="h-4 w-4 mr-1" />
             <span>{question.answers.length > 0 ? `${question.answers.length} Answers` : 'Answer'}</span>
@@ -145,6 +162,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
                 <VoiceInput 
                   onRecordingComplete={(blob) => console.log('Recording completed', blob)} 
                 />
+                <Button 
+                  size="sm" 
+                  className="h-8 px-3 bg-ocean-DEFAULT hover:bg-ocean-dark"
+                >
+                  <Send className="h-3 w-3 mr-1" />
+                  <span>Send</span>
+                </Button>
               </div>
             </div>
           </div>

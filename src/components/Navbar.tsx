@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import VoiceInput from './VoiceInput';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LanguageSelector from './LanguageSelector';
 import LocationSelector from './LocationSelector';
 
@@ -42,6 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("Tokyo, Japan");
   
@@ -222,6 +223,11 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
     setActiveConversation(userId);
   };
 
+  const handleOpenUserProfile = (userId: string) => {
+    setShowMessages(false);
+    navigate(`/user/${userId}`);
+  };
+
   const handleUpdateLocation = (location: string) => {
     setCurrentLocation(location);
     setShowLocationSelector(false);
@@ -305,6 +311,15 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             >
               <Globe className="h-5 w-5" />
             </Button>
+            <Link to="/register">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                title="Register"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
             <Button 
               variant="ghost" 
               size="icon"
@@ -314,12 +329,12 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
               <MessageCircle className="h-5 w-5" />
             </Button>
             <Button 
-              size="icon" 
-              className="bg-sunset-DEFAULT hover:bg-sunset-dark rounded-full"
+              size="sm" 
+              className="bg-sunset-DEFAULT hover:bg-sunset-dark rounded-md"
               onClick={onAskQuestion}
               title="Ask a question"
             >
-              <Mic className="h-5 w-5" />
+              <Mic className="h-4 w-4 mr-1" /> Ask
             </Button>
           </div>
         </div>
@@ -330,7 +345,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-medium">Messages</h3>
             <Button variant="ghost" size="sm" onClick={toggleMessages}>
-              Close
+              <X className="h-4 w-4" />
             </Button>
           </div>
           
@@ -340,31 +355,23 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 key={message.id} 
                 className="p-3 rounded-md bg-gray-100 dark:bg-gray-700 flex items-start cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"
               >
-                <Link 
-                  to={`/user/${message.userId}`} 
-                  className="h-8 w-8 mr-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleMessages();
-                  }}
+                <div 
+                  onClick={() => handleOpenUserProfile(message.userId || '')}
+                  className="h-8 w-8 mr-2 cursor-pointer"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={message.avatar} alt={message.sender} />
                     <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
                   </Avatar>
-                </Link>
+                </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <Link 
-                      to={`/user/${message.userId}`} 
-                      className="text-sm font-medium hover:underline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleMessages();
-                      }}
+                    <div 
+                      onClick={() => handleOpenUserProfile(message.userId || '')}
+                      className="text-sm font-medium hover:underline cursor-pointer"
                     >
                       {message.sender}
-                    </Link>
+                    </div>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -374,7 +381,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                         message.userId && handleOpenConversation(message.userId);
                       }}
                     >
-                      Message
+                      DM
                     </Button>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
@@ -394,7 +401,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
       )}
       
       {showMessages && activeConversation && (
-        <div className="absolute right-4 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
+        <div className="absolute right-0 top-0 w-full h-full md:w-96 md:h-auto md:right-4 md:mt-2 md:top-16 bg-white dark:bg-gray-800 md:rounded-md shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-50">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
               <Button 
@@ -406,9 +413,16 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Link to={`/user/${activeConversation}`} className="font-medium hover:underline">
-                {conversations[activeConversation].username}
-              </Link>
+              <div 
+                onClick={() => handleOpenUserProfile(activeConversation)}
+                className="flex items-center cursor-pointer hover:underline"
+              >
+                <Avatar className="h-6 w-6 mr-2">
+                  <AvatarImage src={conversations[activeConversation].avatar} alt={conversations[activeConversation].username} />
+                  <AvatarFallback>{conversations[activeConversation].username.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <span className="font-medium">{conversations[activeConversation].username}</span>
+              </div>
             </div>
             <Button 
               variant="ghost" 
@@ -420,7 +434,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             </Button>
           </div>
           
-          <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto mb-3">
             {conversations[activeConversation].messages.map((message) => (
               <div 
                 key={message.id} 

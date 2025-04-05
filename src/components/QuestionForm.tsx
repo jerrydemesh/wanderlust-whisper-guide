@@ -47,12 +47,14 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ onSubmit }) => {
         />
         
         <div className="flex justify-between items-center">
-          <VoiceInput
-            onRecordingComplete={(blob) => {
-              setAudioBlob(blob);
-              console.log('Recording completed', blob);
-            }}
-          />
+          <div className="flex items-center">
+            <VoiceInput
+              onRecordingComplete={(blob) => {
+                setAudioBlob(blob);
+                console.log('Recording completed', blob);
+              }}
+            />
+          </div>
           
           <Button 
             type="submit" 

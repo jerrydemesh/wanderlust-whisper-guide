@@ -40,6 +40,35 @@ const InitialPrompts = () => {
           description: "Choose your preferred language for better communication.",
         });
       }, 3000);
+
+      // Try to get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log("Location obtained:", position.coords.latitude, position.coords.longitude);
+            // In a real app, here we would do reverse geocoding to get location name
+            
+            toast({
+              title: "Location Detected",
+              description: "Your location has been detected. Connecting you with local guides.",
+            });
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            toast({
+              title: "Location Access Denied",
+              description: "To get the best experience, please enable location access.",
+            });
+          }
+        );
+      }
+      
+      // Try to detect browser language
+      const userLanguage = navigator.language || "en-US";
+      console.log("Detected language:", userLanguage);
+      
+      // In a real app, we would use this to set the default language
+      localStorage.setItem("userLanguage", userLanguage);
     }
   }, [toast]);
   

@@ -91,7 +91,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, userData, userQuestio
               variant="default"
               onClick={() => setShowMessageForm(!showMessageForm)}
             >
-              Message
+              {showMessageForm ? "Hide Message Form" : "Message"}
             </Button>
           </div>
           <p className="text-sm">
