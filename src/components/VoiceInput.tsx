@@ -91,10 +91,10 @@ const VoiceInput: React.FC<VoiceInputProps> = ({ onRecordingComplete, className 
         <Button
           variant="outline"
           size="icon"
-          className="rounded-full bg-sunset-DEFAULT hover:bg-sunset-dark"
+          className="rounded-full bg-sunset-DEFAULT hover:bg-sunset-dark text-white"
           onClick={startRecording}
         >
-          <Mic className="h-4 w-4 text-white" />
+          <Mic className="h-4 w-4" />
         </Button>
       )}
     </div>
