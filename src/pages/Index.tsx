@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import QuestionCard from '@/components/QuestionCard';
@@ -26,20 +25,16 @@ const Index = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Load initial questions
     setQuestions(getQuestionsWithUsers());
   }, []);
   
   useEffect(() => {
-    // Apply filters and sorting
     let filtered = [...questions];
     
-    // Apply category filter if set
     if (categoryFilter) {
       filtered = filtered.filter(q => q.category === categoryFilter);
     }
     
-    // Apply sorting
     filtered.sort((a, b) => {
       const dateA = new Date(a.timestamp).getTime();
       const dateB = new Date(b.timestamp).getTime();
@@ -50,7 +45,6 @@ const Index = () => {
   }, [questions, categoryFilter, sortOrder]);
 
   const handleAskQuestion = (question: string, audioBlob?: Blob) => {
-    // In a real app, we would send the question to the backend
     console.log('New question:', question, audioBlob);
     
     toast({
@@ -64,7 +58,6 @@ const Index = () => {
   const toggleQuestionForm = () => {
     setShowQuestionForm(!showQuestionForm);
     
-    // Scroll to the form if it's being shown
     if (!showQuestionForm) {
       setTimeout(() => {
         window.scrollTo({ 
@@ -100,7 +93,6 @@ const Index = () => {
       <Navbar onAskQuestion={toggleQuestionForm} />
       
       <main className="container mx-auto px-4 py-6 max-w-2xl">
-        {/* More prominent Ask Question button */}
         <div className="mb-6">
           <Button 
             onClick={toggleQuestionForm}

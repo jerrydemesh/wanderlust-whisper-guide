@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import UserProfilePage from "./pages/UserProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
+import QuestionDetailPage from "./pages/QuestionDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/register" element={<RegistrationPage />} />
+          <Route path="/question/:questionId" element={<QuestionDetailPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

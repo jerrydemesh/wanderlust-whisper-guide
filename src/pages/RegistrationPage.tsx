@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 const formSchema = z.object({
   username: z.string().min(3, {
@@ -73,6 +73,10 @@ const RegistrationPage: React.FC = () => {
     setTimeout(() => navigate('/'), 1500);
   };
   
+  const handleClose = () => {
+    navigate('/');
+  };
+  
   const availableInterests = [
     { id: "food", label: "Food & Cuisine" },
     { id: "culture", label: "Culture & History" },
@@ -85,7 +89,16 @@ const RegistrationPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
       <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-lg mx-auto">
+        <Card className="max-w-lg mx-auto relative">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-2 top-2 z-10" 
+            onClick={handleClose}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          
           <CardHeader className="text-center">
             <Link to="/" className="inline-block mb-4">
               <div className="flex items-center justify-center">

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones, Send } from 'lucide-react';
+import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones, Send, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,17 +38,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
   };
 
   const handleViewAnswers = () => {
-    if (question.answers.length > 0) {
-      // If there are answers, navigate to a dedicated page to view them
-      // For now just toggle the expanded view
-      setIsExpanded(!isExpanded);
-      
-      // In a real implementation you would navigate to a dedicated answer page
-      // navigate(`/question/${question.id}/answers`);
-    } else {
-      // If no answers, just toggle the expanded view to show the answer form
-      setIsExpanded(!isExpanded);
-    }
+    // Navigate to a dedicated question detail page
+    navigate(`/question/${question.id}`);
   };
 
   const handleGoToUserProfile = (userId: string | undefined) => {
@@ -141,39 +132,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, expanded = false 
           </Button>
         </div>
       </CardFooter>
-      
-      {isExpanded && (
-        <div className="border-t border-border p-4">
-          {question.answers.map((answer) => (
-            <AnswerCard key={answer.id} answer={answer} />
-          ))}
-          
-          <div className="mt-4 flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>ME</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 relative">
-              <textarea
-                placeholder="Write your answer..."
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                rows={2}
-              />
-              <div className="absolute right-2 bottom-2 flex items-center gap-2">
-                <VoiceInput 
-                  onRecordingComplete={(blob) => console.log('Recording completed', blob)} 
-                />
-                <Button 
-                  size="sm" 
-                  className="h-8 px-3 bg-ocean-DEFAULT hover:bg-ocean-dark"
-                >
-                  <Send className="h-3 w-3 mr-1" />
-                  <span>Send</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </Card>
   );
 };

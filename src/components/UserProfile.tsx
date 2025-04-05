@@ -10,6 +10,7 @@ import { Badge } from './ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import VoiceInput from './VoiceInput';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface UserProfileProps {
   userId: string;
@@ -22,6 +23,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, userData, userQuestio
   const [newMessage, setNewMessage] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'category'>('date');
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +54,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, userData, userQuestio
         description: `Your voice message to ${userData.username} has been sent.`,
       });
     }, 1000);
+  };
+
+  const handleViewQuestion = (questionId: string) => {
+    navigate(`/question/${questionId}`);
   };
   
   const sortedQuestions = [...userQuestions].sort((a, b) => {
@@ -171,7 +177,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, userData, userQuestio
                     </Badge>
                   </div>
                   <p className="text-sm mb-2">{question.translatedText || question.originalText}</p>
-                  <Button variant="link" size="sm" className="p-0 h-auto">
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="p-0 h-auto"
+                    onClick={() => handleViewQuestion(question.id)}
+                  >
                     View full question
                   </Button>
                 </CardContent>
