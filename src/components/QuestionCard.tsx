@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones } from 'lucide-react';
+import { MapPin, MessageCircle, Heart, CornerDownRight, Mic, Headphones, Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
