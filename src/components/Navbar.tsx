@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, Search, Globe, MessageCircle, Mic, Menu, Send, X, User } from 'lucide-react';
+import { MapPin, Search, Globe, MessageCircle, Mic, Menu, Send, X, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileSidebar from './MobileSidebar';
 import { Textarea } from '@/components/ui/textarea';
@@ -190,7 +190,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
       
       toast({
         title: "Message Sent",
-        description: "Your message has been sent and will be translated automatically.",
+        description: "Your message has been transcribed and will be translated automatically.",
       });
     }
   };
@@ -220,14 +220,6 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
 
   const handleOpenConversation = (userId: string) => {
     setActiveConversation(userId);
-  };
-
-  const handleViewProfile = (userId: string) => {
-    // Open the user profile drawer
-    const user = conversations[userId];
-    if (user) {
-      window.location.href = `/user/${userId}`;
-    }
   };
 
   const handleUpdateLocation = (location: string) => {
@@ -274,14 +266,16 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             <div className="md:hidden">
               <MobileSidebar onAskQuestion={onAskQuestion} />
             </div>
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-ocean-dark dark:text-ocean-light">
-                Wanderlust
-              </h1>
-              <span className="text-xl font-light text-sunset-dark dark:text-sunset-light">
-                Whisper
-              </span>
-            </div>
+            <Link to="/">
+              <div className="flex items-center">
+                <h1 className="text-xl font-bold text-ocean-dark dark:text-ocean-light">
+                  Wanderlust
+                </h1>
+                <span className="text-xl font-light text-sunset-dark dark:text-sunset-light">
+                  Whisper
+                </span>
+              </div>
+            </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-2">
@@ -345,12 +339,20 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
               <div 
                 key={message.id} 
                 className="p-3 rounded-md bg-gray-100 dark:bg-gray-700 flex items-start cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"
-                onClick={() => message.userId && handleOpenConversation(message.userId)}
               >
-                <Avatar className="h-8 w-8 mr-2">
-                  <AvatarImage src={message.avatar} alt={message.sender} />
-                  <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <Link 
+                  to={`/user/${message.userId}`} 
+                  className="h-8 w-8 mr-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleMessages();
+                  }}
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={message.avatar} alt={message.sender} />
+                    <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </Link>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
                     <Link 
@@ -358,10 +360,22 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                       className="text-sm font-medium hover:underline"
                       onClick={(e) => {
                         e.stopPropagation();
+                        toggleMessages();
                       }}
                     >
                       {message.sender}
                     </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 px-2 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        message.userId && handleOpenConversation(message.userId);
+                      }}
+                    >
+                      Message
+                    </Button>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                     {message.text}
@@ -389,13 +403,21 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
                 className="mr-2"
                 onClick={() => setActiveConversation(null)}
               >
-                <X className="h-4 w-4 mr-1" />
+                <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <Link to={`/user/${activeConversation}`} className="font-medium hover:underline">
                 {conversations[activeConversation].username}
               </Link>
             </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6" 
+              onClick={toggleMessages}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
           
           <div className="space-y-3 max-h-[300px] overflow-y-auto mb-3">
