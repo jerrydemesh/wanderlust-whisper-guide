@@ -92,10 +92,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             </div>
             <Link to="/">
               <div className="flex items-center">
-                <h1 className="text-xl font-bold text-ocean-dark dark:text-ocean-light">
+                <h1 className="text-lg md:text-xl font-bold text-ocean-dark dark:text-ocean-light">
                   Wanderlust
                 </h1>
-                <span className="text-xl font-light text-sunset-dark dark:text-sunset-light">
+                <span className="text-lg md:text-xl font-light text-sunset-dark dark:text-sunset-light">
                   Whisper
                 </span>
               </div>
@@ -115,7 +115,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
           </div>
           
           {/* Make the icons container more responsive on small screens */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
+          <div className="flex items-center space-x-0 sm:space-x-1 md:space-x-2">
             {!isMobile && (
               <Button variant="ghost" size="icon">
                 <Search className="h-5 w-5" />
@@ -149,7 +149,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAskQuestion }) => {
             </Link>
             <Button 
               size="sm" 
-              className="bg-sunset-DEFAULT hover:bg-sunset-dark rounded-md"
+              className="bg-red-500 hover:bg-red-600 text-white rounded-md"
               onClick={onAskQuestion}
               title="Ask a question"
             >

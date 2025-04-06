@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,12 +21,10 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
   const [allMessages, setAllMessages] = useState<(Message & { username?: string; userId?: string; avatar?: string })[]>([]);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
 
-  // Initialize with default conversations if not provided
   useEffect(() => {
     if (initialConversations) {
       setConversations(initialConversations);
     } else {
-      // Default conversations
       const defaultConversations: Record<string, Conversation> = {
         'user1': {
           userId: 'user1',
@@ -42,7 +39,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
               location: 'Tokyo',
               text: 'I can help with your question about the best sushi places!',
               isIncoming: true,
-              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 hours ago
+              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2)
             }
           ]
         },
@@ -59,7 +56,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
               location: 'Kyoto',
               text: "Here's information about the temple you asked about...",
               isIncoming: true,
-              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24) // 1 day ago
+              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24)
             }
           ]
         },
@@ -76,7 +73,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
               location: 'Osaka',
               text: 'Let me know if you need more food recommendations!',
               isIncoming: true,
-              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48) // 2 days ago
+              timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48)
             }
           ]
         }
@@ -85,7 +82,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
     }
   }, [initialConversations]);
 
-  // Process messages for the overview
   useEffect(() => {
     const processedMessages = Object.values(conversations).flatMap(conv => 
       conv.messages.map(msg => ({
@@ -97,12 +93,11 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
     ).sort((a, b) => {
       const timeA = a.timestamp?.getTime() || 0;
       const timeB = b.timestamp?.getTime() || 0;
-      return timeB - timeA; // Sort by most recent
+      return timeB - timeA;
     });
     
     setAllMessages(processedMessages);
     
-    // If conversationId is provided in URL, activate that conversation
     if (conversationId && conversations[conversationId]) {
       setActiveConversation(conversationId);
     }
@@ -111,7 +106,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() && activeConversation) {
-      // Add user message
       const userMessage: Message = {
         id: Date.now().toString(),
         sender: 'You',
@@ -121,7 +115,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
         timestamp: new Date()
       };
       
-      // Add to specific conversation
       setConversations(prev => ({
         ...prev,
         [activeConversation]: {
@@ -130,7 +123,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
         }
       }));
       
-      // Simulate response
       simulateResponse(activeConversation);
       setNewMessage('');
       
@@ -221,7 +213,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
 
       <div className="container mx-auto px-4 py-6">
         {!activeConversation ? (
-          // Messages overview
           <div className="space-y-4 max-w-2xl mx-auto">
             <h2 className="font-medium text-lg mb-4">Recent Messages</h2>
             {allMessages.length > 0 ? (
@@ -263,9 +254,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
             )}
           </div>
         ) : (
-          // Active conversation view
           <div className="max-w-2xl mx-auto">
-            {/* Conversation header */}
             <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm flex items-center">
               <Avatar 
                 className="h-10 w-10 mr-3 cursor-pointer" 
@@ -283,7 +272,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
               </div>
             </div>
             
-            {/* Message thread */}
             <div className="space-y-3 mb-4 max-h-[60vh] overflow-y-auto p-2">
               {conversations[activeConversation].messages.map((message) => (
                 <div 
@@ -311,7 +299,6 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
               ))}
             </div>
             
-            {/* Message input */}
             <form onSubmit={handleSendMessage} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
               <Textarea
                 placeholder="Type a message..."
@@ -327,7 +314,7 @@ const MessagesPage: React.FC<MessagesPageProps> = ({ conversations: initialConve
                 <Button 
                   type="submit" 
                   size="sm" 
-                  className="bg-ocean-DEFAULT hover:bg-ocean-dark"
+                  className="bg-red-500 hover:bg-red-600 text-white"
                   disabled={!newMessage.trim()}
                 >
                   <Send className="h-3 w-3 mr-1" />

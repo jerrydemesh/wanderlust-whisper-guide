@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -23,14 +22,12 @@ const QuestionDetailPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get the question from mock data
     const allQuestions = getQuestionsWithUsers();
     const foundQuestion = allQuestions.find(q => q.id === questionId);
     
     if (foundQuestion) {
       setQuestion(foundQuestion);
     } else {
-      // Question not found, navigate back
       toast({
         title: "Question not found",
         description: "The question you're looking for doesn't exist.",
@@ -47,18 +44,15 @@ const QuestionDetailPage = () => {
     e.preventDefault();
     if (!newAnswer.trim()) return;
     
-    // In a real app, we would save the answer to the database
     toast({
       title: "Answer submitted",
       description: "Your answer has been posted.",
     });
     
-    // Reset form
     setNewAnswer('');
   };
 
   const handleVoiceRecording = (blob: Blob) => {
-    // In a real app, we would process the voice blob here
     toast({
       title: "Voice message recorded",
       description: "Your voice answer will be transcribed and posted.",
@@ -214,7 +208,7 @@ const QuestionDetailPage = () => {
               <Button 
                 type="submit" 
                 disabled={!newAnswer.trim()}
-                className="bg-ocean-DEFAULT hover:bg-ocean-dark"
+                className="bg-red-500 hover:bg-red-600 text-white"
               >
                 <Send className="h-4 w-4 mr-1" />
                 Post Answer
