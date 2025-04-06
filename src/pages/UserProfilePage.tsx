@@ -3,30 +3,37 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import UserProfile from '@/components/UserProfile';
-import { getQuestionsWithUsers } from '@/data/mockData';
+import { getQuestionsWithUsers, users } from '@/data/mockData';
 import { Question } from '@/data/mockData';
 
-// Mock user data
+// Mock user data using the same IDs as in our mockData.ts
 const mockUsers = {
   user1: {
     userId: 'user1',
-    username: 'Mika',
-    avatar: '/placeholder.svg',
-    location: 'Tokyo',
+    username: 'Sophie Chen',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+    location: 'Tokyo, Japan',
     messages: []
   },
   user2: {
     userId: 'user2',
-    username: 'Haruto',
-    avatar: '/placeholder.svg',
-    location: 'Kyoto',
+    username: 'Takashi Yamamoto',
+    avatar: 'https://i.pravatar.cc/150?img=2',
+    location: 'Tokyo, Japan',
     messages: []
   },
   user3: {
     userId: 'user3',
-    username: 'Yuki',
-    avatar: '/placeholder.svg',
-    location: 'Osaka',
+    username: 'Maria Garcia',
+    avatar: 'https://i.pravatar.cc/150?img=3',
+    location: 'Paris, France',
+    messages: []
+  },
+  user4: {
+    userId: 'user4',
+    username: 'Pierre Dubois',
+    avatar: 'https://i.pravatar.cc/150?img=4',
+    location: 'Paris, France',
     messages: []
   }
 };

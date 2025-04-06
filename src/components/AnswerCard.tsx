@@ -22,7 +22,12 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
 
   const handleUserClick = () => {
     if (answer.user?.id) {
-      navigate(`/user/${answer.user.id}`);
+      // Check if the user is one of our mock users
+      if (['user1', 'user2', 'user3', 'user4'].includes(answer.user.id)) {
+        navigate(`/user/${answer.user.id}`);
+      } else {
+        console.warn('User ID not found in mock data:', answer.user.id);
+      }
     }
   };
 
