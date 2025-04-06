@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Answer } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface AnswerCardProps {
   answer: Answer;
@@ -12,16 +13,26 @@ interface AnswerCardProps {
 
 const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
   const [showTranslation, setShowTranslation] = useState(true);
+  const navigate = useNavigate();
   
   const formattedDate = new Date(answer.timestamp).toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
   });
 
+  const handleUserClick = () => {
+    if (answer.user?.id) {
+      navigate(`/user/${answer.user.id}`);
+    }
+  };
+
   return (
     <div className="pl-2 border-l-2 border-muted mb-4 last:mb-0">
       <div className="flex gap-3 items-start mb-2">
-        <Avatar className="h-7 w-7">
+        <Avatar 
+          className="h-7 w-7 cursor-pointer" 
+          onClick={handleUserClick}
+        >
           <AvatarImage src={answer.user?.avatar} alt={answer.user?.name} />
           <AvatarFallback>{answer.user?.name?.charAt(0)}</AvatarFallback>
         </Avatar>
@@ -29,7 +40,12 @@ const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
         <div className="flex-1">
           <div className="flex justify-between items-center">
             <div>
-              <span className="font-medium text-sm">{answer.user?.name}</span>
+              <span 
+                className="font-medium text-sm cursor-pointer hover:underline" 
+                onClick={handleUserClick}
+              >
+                {answer.user?.name}
+              </span>
               <span className="text-xs text-muted-foreground ml-2">
                 <span className={`language-badge ${answer.user?.isLocal ? 'language-badge-local' : 'language-badge-traveler'}`}>
                   {answer.originalLanguage}

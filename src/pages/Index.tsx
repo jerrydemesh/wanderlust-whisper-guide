@@ -96,7 +96,7 @@ const Index = () => {
         <div className="mb-6">
           <Button 
             onClick={toggleQuestionForm}
-            className="w-full bg-sunset-DEFAULT hover:border hover:border-sunset-DEFAULT hover:bg-transparent hover:text-sunset-DEFAULT text-white font-medium py-3 flex items-center justify-center gap-2 transition-all duration-300"
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 flex items-center justify-center gap-2 transition-all duration-300"
             size="lg"
           >
             <Mic className="h-5 w-5" />
